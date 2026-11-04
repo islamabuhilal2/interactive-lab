@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101f30">
+  <title>Labscape — Interactive Solution Dilution</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script
+    type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
+</head>
+
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none">
+            <path d="M12 4v9L5.5 25c-.8 1.5.2 3 2 3h17c1.8 0 2.8-1.5 2-3L20 13V4" stroke="currentColor"
+              stroke-width="2.2" stroke-linecap="round" />
+            <path d="M10 5h12M9 21c5-3 9 3 14-1" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            <circle cx="14" cy="23" r="1" fill="currentColor" />
+          </svg></div>
+        <div class="brand-wordmark">
+          <div class="brand-name">LAB<span>SCAPE</span><span class="brand-edition"> / 3D</span></div>
+          <div class="brand-sub">INTERACTIVE CHEMISTRY STUDIO</div>
+        </div>
+      </div>
+      <div class="header-center"><span class="live-dot"></span><span id="headerExperiment">EXPERIMENT 01 / SOLUTION
+          DILUTION</span></div>
+      <div class="top-actions">
+        <button id="soundBtn" class="header-action" type="button" aria-label="Toggle sound"><span
+            id="soundIcon">♫</span><span class="label-dynamic" id="soundText">Sound on</span></button>
+        <button id="languageBtn" class="header-action language-action" type="button" aria-label="Change language"><span
+            class="language-icon" aria-hidden="true">文</span><span id="langText">عربي</span></button>
+        <button id="resetBtn" class="header-action reset-action" type="button" aria-label="Reset experiment"><span
+            class="reset-icon" aria-hidden="true">↺</span><span id="resetText">Reset</span></button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="stage" aria-label="Interactive 3D laboratory scene">
+        <div class="stage-head">
+          <div class="stage-heading"><span class="stage-tag" id="eyebrow">INTERACTIVE CHEMISTRY</span><span
+              class="stage-name" id="stageName">The art of dilution</span></div>
+          <div class="stage-progress"><span class="step-progress-text" id="stepProgressText">Step 1 / 6</span><span
+              class="progress-bars" id="progressBars"
+              aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+        </div>
+        <div class="viewport" id="viewport">
+          <div class="transfer-badge" id="transferBadge" hidden aria-live="off">
+            <div class="transfer-icon">↘</div>
+            <div class="transfer-detail"><span id="transferTitle">Transferring</span><b id="transferText">0 / 40 mL</b>
+              <div class="transfer-track"><span id="transferProgress"></span></div>
+            </div>
+          </div>
+          <div class="viewport-overlay">
+            <div class="helper-tag">
+              <div class="helper-eyebrow"><span class="pulse-dot"></span><span id="helperHead">NEXT ACTION</span></div>
+              <div class="helper-text" id="helperText">Drag the graduated cylinder onto the workbench.</div>
+            </div>
+          </div>
+          <div class="view-controls" role="group" aria-label="3D view controls">
+            <button class="focus-button" id="scaleFocusBtn" type="button" aria-pressed="false"
+              title="Focus on 3D scale"><span>⚖</span><span id="scaleFocusText">Scale view</span></button>
+            <button class="view-btn" id="zoomIn" type="button" title="Zoom in" aria-label="Zoom in">+</button>
+            <button class="view-btn" id="zoomOut" type="button" title="Zoom out" aria-label="Zoom out">−</button>
+            <button class="view-btn" id="viewReset" type="button" title="Reset camera"
+              aria-label="Reset camera">⌖</button>
+          </div>
+          <div class="scale-mini" id="scaleMini" hidden>
+            <div class="scale-mini-head" id="scaleMiniTitle">Digital scale</div>
+            <div class="scale-mini-value"><strong id="scaleMiniReading">0.0</strong><span>g</span></div>
+            <p id="scaleMiniHint">Place mixing beaker on platform</p><button id="scaleMiniTare" type="button">Tare /
+              zero</button>
+          </div>
+          <div class="world-label" id="labelStock"><b id="labelStockTitle">Stock solution</b><small
+              id="labelStockAmount">120 mL · 1.00 M</small><i class="label-dot"></i></div>
+          <div class="world-label" id="labelCylinder"><b id="labelCylinderTitle">Cylinder</b><small
+              id="labelCylinderAmount">0 mL</small><i class="label-dot"></i></div>
+          <div class="world-label" id="labelBeaker"><b id="labelBeakerTitle">Mixing beaker</b><small
+              id="labelBeakerAmount">0 mL</small><i class="label-dot"></i></div>
+          <div class="world-label" id="labelBurette"><b id="labelBuretteTitle">Water burette</b><small
+              id="labelBuretteAmount">100 mL</small><i class="label-dot"></i></div>
+          <div class="world-label" id="labelScale"><b id="labelScaleTitle">Digital scale</b><small
+              id="labelScaleAmount">0.0 g</small><i class="label-dot"></i></div>
+          <div class="world-label" id="labelWater"><b id="labelWaterTitle">Distilled water</b><small
+              id="labelWaterAmount">180 mL</small><i class="label-dot"></i></div>
+          <div class="drag-badge" id="dragBadge">🧪 Place on workbench</div>
+          <div class="toast" id="toast" role="status" aria-live="polite"></div>
+          <div class="loading" id="loading">
+            <div class="loader-card">
+              <div class="loader-icon">⚗</div>
+              <div class="loader-title" id="loadingTitle">Preparing your 3D laboratory</div>
+              <div class="loader-message" id="loadingMessage">Loading your real laboratory equipment…</div>
+              <div class="loader-meter"><span id="loadingBar"></span></div><small class="loader-help">If this takes a
+                while, check your connection. The 3D engine is loaded online.</small>
+            </div>
+          </div>
+          <div class="viewport-index"><span class="viewport-index-dot"></span> 3D WORKSPACE</div>
+        </div>
+
+        <div class="tray" id="tray">
+          <div class="tray-intro">
+            <div class="tray-title" id="trayTitle">EQUIPMENT · DRAG TO EXPLORE</div>
+            <div class="tray-sub">Your tools</div>
+          </div>
+          <div class="tray-row">
+            <button class="tool-card enabled" id="toolCylinder" data-tool="cylinder" type="button"><span
+                class="tool-emoji">🧪</span><span class="tool-meta"><b id="toolCylinderName">Cylinder</b><small
+                  id="toolCylinderState">Drag to place</small></span></button>
+            <button class="tool-card locked" id="toolStock" data-tool="stock" type="button"><span
+                class="tool-emoji">⚗</span><span class="tool-meta"><b id="toolStockName">Stock solution</b><small
+                  id="toolStockState">On the table</small></span></button>
+            <button class="tool-card locked" id="toolBeaker" data-tool="beaker" type="button"><span
+                class="tool-emoji">🥛</span><span class="tool-meta"><b id="toolBeakerName">Mixing beaker</b><small
+                  id="toolBeakerState">On the table</small></span></button>
+            <button class="tool-card locked" id="toolWater" data-tool="water" type="button"><span
+                class="tool-emoji">💧</span><span class="tool-meta"><b id="toolWaterName">Distilled water</b><small
+                  id="toolWaterState">On the table</small></span></button>
+          </div>
+        </div>
+        <footer class="hud-footer"><span class="interaction-guide"><span class="green-dot"></span><span
+              id="footerHint">Drag the vessels in 3D; bring them together to pour.</span></span><button id="hintButton"
+            class="hint-cta" type="button">✧ Get a hint</button></footer>
+      </section>
+
+      <aside class="sidebar" aria-label="Experiment guidance and measurements">
+        <section class="side-card intro">
+          <div class="intro-overline" id="introEyebrow">EXPLORE · UNDERSTAND · DISCOVER</div>
+          <div class="intro-title-row">
+            <div>
+              <h1 id="introTitle">Dilution of solutions</h1>
+              <p id="introDescription">Discover how adding water changes concentration without changing the amount of
+                solute.</p>
+            </div>
+            <div class="intro-bubble">H₂O</div>
+          </div>
+        </section>
+        <section class="side-card steps-card">
+          <div class="section-head"><b id="stepHeading">Lab procedure</b><span class="step-count" id="stepCount">0 / 6
+              complete</span></div>
+          <div class="timeline" id="timeline">
+            <div class="timeline-row current"><span class="number"><span class="num-content">1</span></span><span
+                class="timeline-text">Prepare apparatus</span></div>
+          </div>
+        </section>
+        <section class="active-task">
+          <div class="task-heading">
+            <div class="task-icon">↗</div>
+            <div class="task-kicker"><span id="taskKicker">YOUR NEXT MOVE</span><span id="taskCounter">01 / 06</span>
+            </div>
+          </div>
+          <h2 id="taskTitle">Prepare apparatus</h2>
+          <p id="taskBody">Place the graduated cylinder on the workbench.</p>
+          <div class="target-status" id="targetStatus" hidden>
+            <div class="target-status-top"><span id="targetStatusLabel">Target measurement</span><strong
+                id="targetStatusValue">0 / 40 mL</strong></div>
+            <div class="target-status-bar"><i id="targetStatusBar"></i></div>
+          </div>
+        </section>
+        <section class="side-card control-card">
+          <div class="controls" id="volumeControls" hidden>
+            <div class="control-head"><span class="control-name" id="volumeTitle">Amount to pour</span><span
+                class="value-chip" id="volumeValue">40 mL</span></div><input aria-label="Transfer volume in millilitres"
+              type="range" min="5" max="80" step="5" value="40" class="range" id="volumeSlider">
+            <div class="range-range"><span>5 mL</span><span id="volumeMax">80 mL</span></div>
+            <div class="caption-control" id="controlCaption">Set volume, then drag the flask to the cylinder.</div>
+            <button type="button" class="secondary-action extra-controls" id="correctMistakeBtn" hidden>Empty cylinder
+              and retry</button>
+          </div>
+          <div id="observation" class="controls" hidden>
+            <div class="control-name" id="observationTitle">Observe the color difference</div>
+            <div class="color-comparison">
+              <div class="color-cup original"><span></span></div>
+              <div class="color-arrow">→</div>
+              <div class="color-cup dilute"><span></span></div>
+            </div>
+            <div class="caption-control" id="observationCaption">The color lightens as concentration decreases.</div>
+            <div class="prediction"><span class="prediction-question" id="predictionQuestion">After adding water, what
+                happens to concentration?</span>
+              <div class="prediction-choices"><button type="button" id="predDecrease" aria-pressed="false">It
+                  decreases</button><button type="button" id="predIncrease" aria-pressed="false">It increases</button>
+              </div><span class="prediction-feedback" id="predictionFeedback" aria-live="polite"></span>
+            </div><button type="button" class="primary-action" id="continueBtn" disabled>Continue to calculation
+              →</button>
+          </div>
+          <div id="quiz" class="quiz" hidden><span class="control-name" id="quizTitle">Calculate the new
+              concentration</span>
+            <p id="quizDesc">40 mL of 1.00 M solution is diluted to 100 mL. What is C₂?</p>
+            <div class="quiz-row"><input type="text" inputmode="decimal" aria-label="Final concentration"
+                placeholder="e.g. 0.40" id="answerInput"><button class="primary-action" type="button"
+                id="checkBtn">Check</button></div>
+            <div id="answerFeedback" class="quiz-correct" aria-live="polite"></div>
+          </div>
+          <div id="idleControls" class="caption-control">Drag the appropriate equipment in the 3D scene to begin.</div>
+        </section>
+        <section class="side-card metrics-card">
+          <div class="section-head"><b id="liveHeading">Live measurements</b><span class="live-chip" id="liveStatus">●
+              LIVE</span></div>
+          <div class="metrics">
+            <div class="metric"><label id="metricStockLabel">Stock in beaker</label><b><span
+                  id="metricStock">0</span><small>mL</small></b></div>
+            <div class="metric"><label id="metricWaterLabel">Added water</label><b><span
+                  id="metricWater">0</span><small>mL</small></b></div>
+            <div class="metric total"><label id="metricTotalLabel">Total volume</label><b><span
+                  id="metricTotal">0</span><small>mL</small></b></div>
+          </div>
+          <div class="formula"><span>C₁V₁ = C₂V₂</span><strong id="concentrationText">C₂ = — M</strong></div>
+        </section>
+        <details class="side-card precision-card" id="precisionCard">
+          <summary><span class="precision-heading"><span class="precision-icon">⚖</span><span
+                id="stationHeading">Precision instruments</span></span><span class="precision-summary-side"><span
+                class="station-dots" id="stationLive">LIVE</span><span class="chevron">⌄</span></span></summary>
+          <div class="precision-content">
+            <p class="precision-description" id="stationDescription">Weigh the beaker on the scale, or add water with
+              the burette.</p>
+            <div class="precision-grid">
+              <div class="precision-item"><span class="precision-name" id="scaleTitle">⚖ Digital scale</span>
+                <div class="precision-number"><span id="scaleReading">0.0</span><small>g</small></div><button
+                  class="station-button" id="scaleTare" type="button">Tare / zero</button>
+                <div class="burette-indicator" aria-hidden="true"><span id="scaleIndicator"></span></div>
+              </div>
+              <div class="precision-item"><span class="precision-name" id="buretteTitle">💧 Water burette</span>
+                <div class="precision-number"><span id="buretteReading">100.0</span><small>mL</small></div><button
+                  class="station-button valve" id="valveButton" type="button" disabled>Hold to dispense</button>
+                <div class="burette-indicator" aria-hidden="true"><span id="buretteIndicator"></span></div>
+              </div>
+            </div>
+            <div class="precision-instruction" id="stationInstruction" hidden></div>
+          </div>
+        </details>
+        <div class="sidebar-footer"><span>LABSCAPE · LEARNING BY DOING</span><span>01 / CHEMISTRY</span></div>
+      </aside>
+    </main>
+  </div>
+  <script type="module" src="./lab.js"></script>
+  <script defer src="./ux.js"></script>
+</body>
+
+</html>
